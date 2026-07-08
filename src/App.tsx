@@ -10,6 +10,7 @@ import SubmissionForm from './components/SubmissionForm';
 import SuccessView from './components/SuccessView';
 import SupportView from './components/SupportView';
 import ToastContainer from './components/ToastContainer';
+import MailConfigModal from './components/MailConfigModal';
 import { initAuth, googleSignIn, logout } from './lib/googleAuth';
 import { savePartnerSubmission, loadPartnerSubmissions, saveSupportTicket } from './lib/db';
 import { generateExcelBlob } from './lib/googleDrive';
@@ -20,6 +21,7 @@ export default function App() {
   const [tickets, setTickets] = useState<SupportTicket[]>(SAMPLE_TICKETS);
   const [lastSubmittedPartner, setLastSubmittedPartner] = useState<PartnerData | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isMailConfigOpen, setIsMailConfigOpen] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -116,19 +118,18 @@ export default function App() {
       // 3. Save last submitted data to preview on Success screen
       setLastSubmittedPartner(completePartner);
 
-      // 4. Trigger silent background upload to Google Drive if a script URL is configured
-      const scriptUrl = localStorage.getItem('google_apps_script_url');
-      if (scriptUrl) {
-        const excelBlob = generateExcelBlob({
-          companyName: completePartner.companyName,
-          location: completePartner.location,
-          capacity: completePartner.capacity,
-          profile: completePartner.profile,
-          functions: completePartner.functions,
-          competencies: completePartner.competencies
-        });
+      // 4. Generate the Excel file and convert it to Base64 to send to our native backend API
+      const excelBlob = generateExcelBlob({
+        companyName: completePartner.companyName,
+        location: completePartner.location,
+        capacity: completePartner.capacity,
+        profile: completePartner.profile,
+        functions: completePartner.functions,
+        competencies: completePartner.competencies
+      });
 
-        const reader = new FileReader();
+      const reader = new FileReader();
+      const sendEmailPromise = new Promise((resolve, reject) => {
         reader.onloadend = async () => {
           try {
             const base64String = (reader.result as string).split(',')[1];
@@ -136,31 +137,40 @@ export default function App() {
             const dateString = new Date().toISOString().split('T')[0];
             const fileName = `Ficha_Colaborador_${cleanCompanyName}_${dateString}.xlsx`;
 
-            await fetch(scriptUrl, {
+            const response = await fetch('/api/send-partner', {
               method: 'POST',
-              mode: 'no-cors',
               headers: {
-                'Content-Type': 'text/plain'
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                fileName,
-                base64Data: base64String
+                partner: completePartner,
+                excelBase64: base64String,
+                fileName
               })
             });
-            console.log('Ficha enviada a Google Drive en segundo plano de forma silenciosa.');
+
+            const resData = await response.json();
+            if (!response.ok) {
+              throw new Error(resData.error || 'Error al enviar por correo');
+            }
+            resolve(true);
           } catch (err) {
-            console.error('Error al subir a Google Drive en segundo plano:', err);
+            reject(err);
           }
         };
+        reader.onerror = () => reject(new Error('Error al leer el archivo Excel'));
         reader.readAsDataURL(excelBlob);
-      }
+      });
+
+      // Wait for email delivery before notifying success, or run in background
+      await sendEmailPromise;
 
       // Show beautiful toast notification instead of transition to success tab
-      showToast(`¡Formulario enviado con éxito! Ficha de colaborador guardada y enviada por correo a srubin@bejob.com.`, 'success');
+      showToast(`¡Formulario enviado con éxito! Ficha de colaborador guardada y enviada directamente a srubin@bejob.com.`, 'success');
       return true;
     } catch (err: any) {
       console.error('Error en el envío:', err);
-      showToast(`Error al guardar los datos: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
+      showToast(`Error al enviar los datos: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
       throw err;
     }
   };
@@ -180,34 +190,26 @@ export default function App() {
       await saveSupportTicket(completeTicket);
       setTickets([completeTicket, ...tickets]);
 
-      // Trigger silent background upload/delivery of support ticket to Google Apps Script
-      const scriptUrl = localStorage.getItem('google_apps_script_url');
-      if (scriptUrl) {
-        try {
-          await fetch(scriptUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-              'Content-Type': 'text/plain'
-            },
-            body: JSON.stringify({
-              type: 'ticket',
-              fullName: completeTicket.fullName,
-              email: completeTicket.email,
-              subject: completeTicket.subject,
-              message: completeTicket.message
-            })
-          });
-          console.log('Mensaje de soporte enviado al webhook para reenvío por correo.');
-        } catch (webhookErr) {
-          console.error('Error al enviar mensaje de soporte al webhook:', webhookErr);
-        }
+      // Call our native backend API route directly
+      const response = await fetch('/api/send-support', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ticket: completeTicket
+        })
+      });
+
+      const resData = await response.json();
+      if (!response.ok) {
+        throw new Error(resData.error || 'Error al enviar el mensaje de soporte');
       }
 
       showToast('¡Su mensaje de soporte se ha enviado correctamente por correo a srubin@bejob.com!', 'success');
     } catch (err: any) {
       console.error('Error al crear ticket:', err);
-      showToast(`Error al crear el ticket de soporte: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
+      showToast(`Error al enviar el mensaje de soporte: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
     }
   };
 
@@ -223,6 +225,7 @@ export default function App() {
       <Header 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
+        onOpenMailConfig={() => setIsMailConfigOpen(true)}
       />
 
       {/* Main Body Layout Grid */}
@@ -271,6 +274,12 @@ export default function App() {
       <ToastContainer 
         toasts={toasts} 
         onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} 
+      />
+
+      <MailConfigModal 
+        isOpen={isMailConfigOpen} 
+        onClose={() => setIsMailConfigOpen(false)} 
+        showToast={showToast} 
       />
 
     </div>
