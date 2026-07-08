@@ -52,18 +52,6 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           <span className="material-symbols-outlined">help</span>
           <span>Soporte Técnico</span>
         </button>
-
-        <button
-          onClick={() => setActiveTab('inbox')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-sans text-sm font-medium ${
-            activeTab === 'inbox'
-              ? 'bg-secondary-container text-primary font-bold shadow-sm'
-              : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
-          }`}
-        >
-          <span className="material-symbols-outlined">inbox</span>
-          <span>Bandeja de Entrada</span>
-        </button>
       </nav>
 
       {/* Quick Status / Identity Info */}

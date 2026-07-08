@@ -9,7 +9,6 @@ import LandingView from './components/LandingView';
 import SubmissionForm from './components/SubmissionForm';
 import SuccessView from './components/SuccessView';
 import SupportView from './components/SupportView';
-import AdminInboxView from './components/AdminInboxView';
 import ToastContainer from './components/ToastContainer';
 import { initAuth, googleSignIn, logout } from './lib/googleAuth';
 import { savePartnerSubmission, loadPartnerSubmissions, saveSupportTicket } from './lib/db';
@@ -258,14 +257,6 @@ export default function App() {
 
             {activeTab === 'support' && (
               <SupportView onSubmitTicket={handleTicketSubmit} setActiveTab={setActiveTab} />
-            )}
-
-            {activeTab === 'inbox' && (
-              <AdminInboxView 
-                setActiveTab={setActiveTab} 
-                allPartners={partners} 
-                onRefreshPartners={refreshPartners}
-              />
             )}
 
           </div>

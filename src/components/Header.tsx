@@ -63,17 +63,6 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
             >
               Soporte Técnico
             </button>
-            <button
-              onClick={() => setActiveTab('inbox')}
-              className={`px-3 py-1.5 rounded-full font-sans text-sm font-medium transition-all flex items-center gap-1 ${
-                activeTab === 'inbox' 
-                  ? 'bg-secondary-container text-primary font-semibold' 
-                  : 'text-on-surface-variant hover:bg-surface-container-low'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">inbox</span>
-              <span>Bandeja de Entrada</span>
-            </button>
           </nav>
 
           {/* Utility items */}

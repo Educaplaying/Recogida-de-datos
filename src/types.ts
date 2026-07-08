@@ -24,7 +24,7 @@ export interface SupportTicket {
   status: 'Pending' | 'In Progress' | 'Resolved';
 }
 
-export type ActiveTab = 'landing' | 'submission' | 'success' | 'support' | 'inbox';
+export type ActiveTab = 'landing' | 'submission' | 'success' | 'support';
 
 export interface Toast {
   id: string;
