@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Hanken Grotesk", sans-serif;
+  
+  /* Primary & Accent brand colors configured from the provided portal designs */
+  --color-primary: #003d9b;
+  --color-primary-container: #002c73;
+  --color-on-primary: #ffffff;
+  --color-background: #f9f9ff;
+  --color-on-background: #041b3c;
+  --color-surface: #ffffff;
+  --color-on-surface: #041b3c;
+  --color-on-surface-variant: #434654;
+  --color-outline: #737685;
+  --color-outline-variant: #c3c6d6;
+  --color-surface-container-low: #f1f3ff;
+  --color-surface-container: #e8edff;
+  --color-surface-container-high: #e0e8ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-secondary-container: #d4e0f8;
+  --color-on-secondary-container: #576377;
+}
+
+/* Custom visual styles */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.success-animation {
+  animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

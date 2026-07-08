@@ -1,0 +1,6 @@
+{
+  "name": "Portal de Colaboración - Recogida de Datos",
+  "description": "Portal de colaboración corporativa de la Fundación Secretariado Gitano y BeJob para la recogida de datos de empresas, soporte técnico y gestión de colaboraciones.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
