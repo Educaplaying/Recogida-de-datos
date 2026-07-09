@@ -44,16 +44,6 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
               Inicio
             </button>
             <button
-              onClick={() => setActiveTab('info')}
-              className={`px-3 py-1.5 rounded-full font-sans text-sm font-medium transition-all ${
-                activeTab === 'info' 
-                  ? 'bg-secondary-container text-primary font-semibold' 
-                  : 'text-on-surface-variant hover:bg-surface-container-low'
-              }`}
-            >
-              Propuesta de Valor
-            </button>
-            <button
               onClick={() => setActiveTab('submission')}
               className={`px-3 py-1.5 rounded-full font-sans text-sm font-medium transition-all ${
                 activeTab === 'submission' || activeTab === 'success'

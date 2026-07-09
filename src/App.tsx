@@ -4,12 +4,10 @@ import { PartnerData, SupportTicket, ActiveTab, Toast } from './types';
 import { SAMPLE_PARTNERS, SAMPLE_TICKETS } from './data';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Sidebar from './components/Sidebar';
 import LandingView from './components/LandingView';
 import SubmissionForm from './components/SubmissionForm';
 import SuccessView from './components/SuccessView';
 import SupportView from './components/SupportView';
-import InfoView from './components/InfoView';
 import ToastContainer from './components/ToastContainer';
 import { initAuth, googleSignIn, logout } from './lib/googleAuth';
 import { savePartnerSubmission, loadPartnerSubmissions, saveSupportTicket } from './lib/db';
@@ -310,21 +308,14 @@ export default function App() {
 
       {/* Main Body Layout Grid */}
       <div className="flex-grow flex">
-        
-        {/* Persistent Desktop Sidebar */}
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Dynamic Canvas Area */}
-        <main className="flex-grow pt-24 lg:ml-64 min-h-[80vh] flex flex-col justify-between">
+        <main className="flex-grow pt-24 min-h-[80vh] flex flex-col justify-between">
           <div className="max-w-[960px] mx-auto w-full px-4 md:px-8 py-6 flex-grow">
             
             {/* Conditional Tab Rendering */}
             {activeTab === 'landing' && (
               <LandingView setActiveTab={setActiveTab} />
-            )}
-
-            {activeTab === 'info' && (
-              <InfoView setActiveTab={setActiveTab} />
             )}
 
             {activeTab === 'submission' && (
