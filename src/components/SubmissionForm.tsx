@@ -456,7 +456,7 @@ export default function SubmissionForm({
           <div className="flex items-center gap-3 text-xs text-on-surface-variant font-sans max-w-xl">
             <span className="material-symbols-outlined text-2xl text-primary flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>cloud_done</span>
             <span>
-              Al enviar este formulario, los datos se registrarán en la plataforma y se generará una <strong>ficha Excel automatizada</strong> que se enviará por correo electrónico al equipo de BeJob (<strong>srubin@bejob.com</strong>).
+              Al enviar este formulario, los datos se registrarán en la plataforma y se generará una <strong>ficha Excel automatizada</strong> que se enviará por correo electrónico al equipo de BeJob.
             </span>
           </div>
 

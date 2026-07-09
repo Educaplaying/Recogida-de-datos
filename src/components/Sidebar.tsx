@@ -65,15 +65,6 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           <span>Soporte Técnico</span>
         </button>
       </nav>
-
-      {/* Quick Status / Identity Info */}
-      <div className="pt-6 border-t border-outline-variant text-xs space-y-2 text-on-surface-variant">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-          <span className="font-medium">Sesión Activa</span>
-        </div>
-        <p className="font-mono text-[10px] text-outline">v1.2.4 • Producción</p>
-      </div>
     </aside>
   );
 }
