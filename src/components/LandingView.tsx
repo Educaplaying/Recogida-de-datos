@@ -189,7 +189,7 @@ export default function LandingView({ setActiveTab }: LandingViewProps) {
             Tu Aliado para un Empleo más Inclusivo y Efectivo
           </h2>
           <p className="text-sm md:text-base text-on-surface-variant leading-relaxed">
-            En <strong>BeJob</strong> e <strong>Iberia / Fundación Secretariado Gitano</strong> conectamos a tu empresa con talento altamente motivado y formado de forma práctica en logística.
+            En <strong>BeJob</strong> y la <strong>Fundación Secretariado Gitano</strong> conectamos a tu empresa con talento altamente motivado y formado de forma práctica en logística.
           </p>
         </div>
 
