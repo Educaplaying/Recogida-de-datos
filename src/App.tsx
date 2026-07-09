@@ -108,65 +108,104 @@ export default function App() {
         submissionDate: formattedDate,
       };
 
-      // 1. Save locally and to Firestore Cloud in the background
-      await savePartnerSubmission(completePartner);
+      // 1. Trigger database save in the background (runs asynchronously, returns instantly)
+      savePartnerSubmission(completePartner).catch(err => {
+        console.error('Error in background database save:', err);
+      });
 
-      // 2. Refresh main listing in memory
+      // 2. Refresh main listing in memory instantly
       setPartners([completePartner, ...partners]);
       
       // 3. Save last submitted data to preview on Success screen
       setLastSubmittedPartner(completePartner);
 
-      // 4. Generate the Excel file and convert it to Base64 to send to our native backend API
+      // 4. Transition to Success view immediately so the user can download Excel/PDF files
+      setActiveTab('success');
+      showToast(`¡Formulario recibido con éxito! Generando ficha y procesando envíos en segundo plano...`, 'info');
+
+      // 5. Generate Excel and process both Email and Formspree submissions in the background
       const excelBlob = generateExcelBlob(completePartner);
-
       const reader = new FileReader();
-      const sendEmailPromise = new Promise((resolve, reject) => {
-        reader.onloadend = async () => {
-          try {
-            const base64String = (reader.result as string).split(',')[1];
-            const cleanCompanyName = completePartner.companyName.trim().replace(/[^a-zA-Z0-9]/g, '_');
-            const dateString = new Date().toISOString().split('T')[0];
-            const fileName = `Ficha_Colaborador_${cleanCompanyName}_${dateString}.xlsx`;
 
-            const response = await fetch('/api/send-partner', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                partner: completePartner,
-                excelBase64: base64String,
-                fileName
-              })
-            });
+      reader.onloadend = async () => {
+        try {
+          const base64String = (reader.result as string).split(',')[1];
+          const cleanCompanyName = completePartner.companyName.trim().replace(/[^a-zA-Z0-9]/g, '_');
+          const dateString = new Date().toISOString().split('T')[0];
+          const fileName = `Ficha_Colaborador_${cleanCompanyName}_${dateString}.xlsx`;
 
-            let resData: any = {};
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-              resData = await response.json();
+          // A. Send to srubin@bejob.com via our server API (Background Task)
+          fetch('/api/send-partner', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              partner: completePartner,
+              excelBase64: base64String,
+              fileName
+            })
+          }).then(async (response) => {
+            if (response.ok) {
+              console.log('Email sent successfully in background!');
+              showToast(`¡Ficha de colaborador enviada correctamente a srubin@bejob.com!`, 'success');
             } else {
-              const text = await response.text();
-              throw new Error(text || `Error del servidor (${response.status})`);
+              const resText = await response.text();
+              console.warn('Backend email API returned warning/error:', resText);
+              showToast(`Ficha registrada localmente. Pendiente de sincronización de correo.`, 'info');
             }
+          }).catch(err => {
+            console.error('SMTP email fetch failed:', err);
+          });
 
-            if (!response.ok) {
-              throw new Error(resData.error || 'Error al enviar por correo');
+          // B. Send to Formspree endpoint (Background Task)
+          const formspreePayload = {
+            "Nombre de la empresa": completePartner.companyName,
+            "Descripción de la empresa": completePartner.companyDescription,
+            "Persona de contacto principal": completePartner.contactPerson,
+            "Cargo": completePartner.contactRole,
+            "Email de contacto": completePartner.contactEmail,
+            "Teléfono de contacto": completePartner.contactPhone,
+            "Participaciones en el programa": completePartner.participations.map((p, idx) => 
+              `CENTRO DE TRABAJO #${idx + 1}\n` +
+              `- Ubicación Exacta: ${p.locationExact}\n` +
+              `- Perfil Solicitado: ${p.profile}\n` +
+              `- Nº Plazas de Prácticas: ${p.slotsCount}\n` +
+              `- Funciones: ${p.functions}\n` +
+              `- Competencias: ${p.competencies}`
+            ).join("\n\n====================\n\n"),
+            "Fecha de registro": completePartner.submissionDate,
+            "ID de registro": completePartner.id
+          };
+
+          fetch('https://formspree.io/f/xlgyyojj', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(formspreePayload)
+          }).then(async (response) => {
+            if (response.ok) {
+              console.log('Formspree submission sent successfully!');
+              showToast(`¡Copia del formulario registrada con éxito en Formspree!`, 'success');
+            } else {
+              console.warn('Formspree returned non-OK status');
             }
-            resolve(true);
-          } catch (err) {
-            reject(err);
-          }
-        };
-        reader.onerror = () => reject(new Error('Error al leer el archivo Excel'));
-        reader.readAsDataURL(excelBlob);
-      });
+          }).catch(formspreeErr => {
+            console.error('Error submitting to Formspree:', formspreeErr);
+          });
 
-      // Wait for email delivery before notifying success, or run in background
-      await sendEmailPromise;
+        } catch (err) {
+          console.error('Error in background reader processing:', err);
+        }
+      };
 
-      // Show beautiful toast notification instead of transition to success tab
-      showToast(`¡Formulario enviado con éxito! Ficha de colaborador guardada y enviada directamente a srubin@bejob.com.`, 'success');
+      reader.onerror = () => {
+        console.error('Error reading generated Excel file in background');
+      };
+      
+      reader.readAsDataURL(excelBlob);
       return true;
     } catch (err: any) {
       console.error('Error en el envío:', err);

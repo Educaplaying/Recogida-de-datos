@@ -82,17 +82,34 @@ export default function SubmissionForm({
     e.preventDefault();
     setSubmitError(null);
 
-    // Basic validation
-    if (participations.some(p => !p.locationExact.trim() || !p.profile.trim() || !p.functions.trim())) {
-      setSubmitError('Por favor, rellene todos los campos requeridos para cada uno de los centros de trabajo.');
+    // Filter out completely empty additional participations (index > 0)
+    const activeParticipations = participations.filter((p, idx) => {
+      if (idx === 0) return true; // First one is always kept and validated
+      // Keep if any core field has content
+      return p.locationExact.trim() !== '' || p.functions.trim() !== '' || p.competencies.trim() !== '';
+    });
+
+    // Basic validation on the first one
+    const firstPart = activeParticipations[0];
+    if (!firstPart || !firstPart.locationExact.trim() || !firstPart.profile.trim() || !firstPart.functions.trim()) {
+      setSubmitError('Por favor, rellene todos los campos requeridos para el primer centro de trabajo.');
+      return;
+    }
+
+    // For any additional active participations, check that they are fully completed
+    const hasIncompleteAdditional = activeParticipations.slice(1).some(
+      p => !p.locationExact.trim() || !p.profile.trim() || !p.functions.trim()
+    );
+    if (hasIncompleteAdditional) {
+      setSubmitError('Por favor, complete todos los campos (Ubicación, Perfil, Funciones) para cada centro de trabajo adicional que haya iniciado, o déjelos totalmente en blanco si no desea incluirlos.');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Map participations with a unique ID
-      const finalParticipations: WorkCenterParticipation[] = participations.map((p, idx) => ({
+      // Map active participations with a unique ID
+      const finalParticipations: WorkCenterParticipation[] = activeParticipations.map((p, idx) => ({
         ...p,
         id: `part-${Date.now()}-${idx}`
       }));
@@ -312,11 +329,11 @@ export default function SubmissionForm({
                   {/* Ubicación Exacta */}
                   <div className="space-y-2 md:col-span-8">
                     <label className="block text-[11px] font-bold text-on-surface font-sans uppercase tracking-wider">
-                      Ubicación Exacta del Centro de Trabajo <span className="text-primary">*</span>
+                      Ubicación Exacta del Centro de Trabajo {index === 0 && <span className="text-primary">*</span>}
                     </label>
                     <input 
                       type="text"
-                      required
+                      required={index === 0}
                       value={part.locationExact}
                       onChange={(e) => handleUpdateParticipation(index, 'locationExact', e.target.value)}
                       placeholder="Ej. Avenida de la Logística, 42, Polígono Industrial de Coslada, 28821 Madrid (No vale solo provincia)"
@@ -327,11 +344,11 @@ export default function SubmissionForm({
                   {/* Número de plazas */}
                   <div className="space-y-2 md:col-span-4">
                     <label className="block text-[11px] font-bold text-on-surface font-sans uppercase tracking-wider">
-                      Nº plazas prácticas <span className="text-primary">*</span>
+                      Nº plazas prácticas {index === 0 && <span className="text-primary">*</span>}
                     </label>
                     <input 
                       type="number"
-                      required
+                      required={index === 0}
                       min={1}
                       value={part.slotsCount}
                       onChange={(e) => handleUpdateParticipation(index, 'slotsCount', Number(e.target.value))}
@@ -343,7 +360,7 @@ export default function SubmissionForm({
                   {/* Perfil */}
                   <div className="space-y-2 md:col-span-12">
                     <label className="block text-[11px] font-bold text-on-surface font-sans uppercase tracking-wider">
-                      Perfil con posibilidades de incorporación <span className="text-primary">*</span>
+                      Perfil con posibilidades de incorporación {index === 0 && <span className="text-primary">*</span>}
                     </label>
                     <div className="relative">
                       <select
@@ -368,7 +385,7 @@ export default function SubmissionForm({
                     <div className="space-y-2 md:col-span-12">
                       <input 
                         type="text"
-                        required
+                        required={index === 0}
                         placeholder="Especifique el perfil (Ej. Auxiliar de inventarios y control de stock)"
                         className="w-full h-11 px-4 border border-outline-variant rounded-xl bg-white text-on-surface font-sans text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
                         onChange={(e) => handleUpdateParticipation(index, 'profile', `Otro: ${e.target.value}`)}
@@ -379,10 +396,10 @@ export default function SubmissionForm({
                   {/* Funciones */}
                   <div className="space-y-2 md:col-span-6">
                     <label className="block text-[11px] font-bold text-on-surface font-sans uppercase tracking-wider">
-                      Funciones principales <span className="text-primary">*</span>
+                      Funciones principales {index === 0 && <span className="text-primary">*</span>}
                     </label>
                     <textarea 
-                      required
+                      required={index === 0}
                       rows={3}
                       value={part.functions}
                       onChange={(e) => handleUpdateParticipation(index, 'functions', e.target.value)}
@@ -394,10 +411,10 @@ export default function SubmissionForm({
                   {/* Competencias */}
                   <div className="space-y-2 md:col-span-6">
                     <label className="block text-[11px] font-bold text-on-surface font-sans uppercase tracking-wider">
-                      Competencias clave requeridas <span className="text-primary">*</span>
+                      Competencias clave requeridas {index === 0 && <span className="text-primary">*</span>}
                     </label>
                     <textarea 
-                      required
+                      required={index === 0}
                       rows={3}
                       value={part.competencies}
                       onChange={(e) => handleUpdateParticipation(index, 'competencies', e.target.value)}

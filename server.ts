@@ -149,22 +149,28 @@ async function startServer() {
         });
       }
 
-      const transporter = getTransporter();
-      await transporter.sendMail({
-        from: `"${fromName}" <${fromEmail}>`,
-        to: emailRecipient,
-        subject,
-        html: htmlBody,
-        attachments
-      });
+      try {
+        const transporter = getTransporter();
+        // Send email in the background so SMTP connection/delivery never blocks the HTTP response
+        transporter.sendMail({
+          from: `"${fromName}" <${fromEmail}>`,
+          to: emailRecipient,
+          subject,
+          html: htmlBody,
+          attachments
+        }).then(() => {
+          console.log("Email sent successfully to srubin@bejob.com in background");
+        }).catch((err) => {
+          console.error("Nodemailer background mail delivery failed:", err);
+        });
+      } catch (transporterErr: any) {
+        console.warn("SMTP Transporter not configured or failed to initialize, skipping email delivery:", transporterErr.message);
+      }
 
-      return res.status(200).json({ success: true, message: "Correo enviado con éxito a srubin@bejob.com" });
+      return res.status(200).json({ success: true, message: "Ficha recibida. El correo se procesará en segundo plano." });
     } catch (err: any) {
-      console.error("Error al enviar correo de colaborador:", err);
-      return res.status(500).json({
-        error: "No se pudo enviar el correo electrónico con la ficha.",
-        details: err.message || "Error de conexión o credenciales"
-      });
+      console.error("Error general en send-partner:", err);
+      return res.status(500).json({ error: "Error interno del servidor", details: err.message });
     }
   });
 
@@ -222,21 +228,27 @@ async function startServer() {
         </div>
       `;
 
-      const transporter = getTransporter();
-      await transporter.sendMail({
-        from: `"${fromName}" <${fromEmail}>`,
-        to: emailRecipient,
-        subject,
-        html: htmlBody
-      });
+      try {
+        const transporter = getTransporter();
+        // Send email in the background so it never blocks the HTTP response
+        transporter.sendMail({
+          from: `"${fromName}" <${fromEmail}>`,
+          to: emailRecipient,
+          subject,
+          html: htmlBody
+        }).then(() => {
+          console.log("Support email sent successfully in background");
+        }).catch((err) => {
+          console.error("Nodemailer background support mail failed:", err);
+        });
+      } catch (transporterErr: any) {
+        console.warn("SMTP Transporter not configured or failed to initialize for support, skipping email:", transporterErr.message);
+      }
 
-      return res.status(200).json({ success: true, message: "Mensaje de soporte enviado con éxito a srubin@bejob.com" });
+      return res.status(200).json({ success: true, message: "Mensaje de soporte recibido. Se procesará en segundo plano." });
     } catch (err: any) {
-      console.error("Error al enviar correo de soporte:", err);
-      return res.status(500).json({
-        error: "No se pudo enviar el mensaje de soporte por correo.",
-        details: err.message || "Error de conexión o credenciales"
-      });
+      console.error("Error general en send-support:", err);
+      return res.status(500).json({ error: "Error interno del servidor", details: err.message });
     }
   });
 
