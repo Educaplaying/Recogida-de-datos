@@ -259,6 +259,35 @@ export default function App() {
         console.error('Failed to post support message to API in background:', err);
       });
 
+      // 5. Send support data to Formspree in the background (https://formspree.io/f/xlgyyojj)
+      const formspreePayload = {
+        "Tipo de Envío": "Soporte Técnico / Consulta",
+        "Nombre completo": completeTicket.fullName,
+        "Email": completeTicket.email,
+        "Asunto": completeTicket.subject,
+        "Mensaje / Consulta": completeTicket.message,
+        "Fecha de registro": completeTicket.submissionDate,
+        "ID de Ticket": completeTicket.id
+      };
+
+      fetch('https://formspree.io/f/xlgyyojj', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formspreePayload)
+      }).then((response) => {
+        if (response.ok) {
+          console.log('Support Formspree submission sent successfully!');
+          showToast('¡Su mensaje de soporte se ha registrado con éxito en Formspree!', 'success');
+        } else {
+          console.warn('Formspree returned non-OK status for support');
+        }
+      }).catch(formspreeErr => {
+        console.error('Error submitting support ticket to Formspree:', formspreeErr);
+      });
+
     } catch (err: any) {
       console.error('Error al crear ticket:', err);
       showToast(`Error al procesar el mensaje de soporte: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
