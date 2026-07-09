@@ -16,18 +16,18 @@ async function startServer() {
 
   // Helper to get SMTP transporter lazily
   function getTransporter() {
-    // Credenciales SMTP escritas directamente para srubin@bejob.com
-    const host = "smtp.gmail.com";
+    // Credenciales SMTP escritas directamente para srubin@bejob.com (Outlook / Office 365)
+    const host = "smtp.office365.com";
     const port = 587;
     const user = "srubin@bejob.com";
     
-    // IMPORTANTE: Reemplace "TU_CONTRASEÑA_DE_APLICACION_DE_GMAIL" con su contraseña de aplicación de 16 caracteres
-    // obtenida de su cuenta de Google (por ejemplo: "abcd efgh ijkl mnop").
-    const pass = process.env.SMTP_PASS || "TU_CONTRASEÑA_DE_APLICACION_DE_GMAIL";
+    // IMPORTANTE: Reemplace "TU_CONTRASEÑA_DE_APLICACION_DE_OUTLOOK" con su contraseña de aplicación de Microsoft
+    // obtenida de la configuración de seguridad de su cuenta (por ejemplo: "abcd-efgh-ijkl-mnop").
+    const pass = process.env.SMTP_PASS || "TU_CONTRASEÑA_DE_APLICACION_DE_OUTLOOK";
 
-    if (pass === "TU_CONTRASEÑA_DE_APLICACION_DE_GMAIL") {
+    if (pass === "TU_CONTRASEÑA_DE_APLICACION_DE_OUTLOOK") {
       throw new Error(
-        "Falta configurar su contraseña de aplicación de Gmail en server.ts. Abra el archivo /server.ts y reemplace 'TU_CONTRASEÑA_DE_APLICACION_DE_GMAIL' con su contraseña de 16 caracteres."
+        "Falta configurar su contraseña de aplicación de Outlook/Microsoft en server.ts. Abra el archivo /server.ts y reemplace 'TU_CONTRASEÑA_DE_APLICACION_DE_OUTLOOK' con su contraseña de 16 caracteres."
       );
     }
 
@@ -39,6 +39,10 @@ async function startServer() {
         user,
         pass,
       },
+      tls: {
+        rejectUnauthorized: false,
+        ciphers: "SSLv3"
+      }
     });
   }
 
@@ -55,53 +59,78 @@ async function startServer() {
       const fromName = process.env.SMTP_FROM_NAME || "BeJob Portal";
       const fromEmail = "srubin@bejob.com";
 
-      const subject = `Nueva Ficha de Colaborador Recibida: ${partner.companyName}`;
+      const subject = `Nueva Ficha de Colaboración: ${partner.companyName}`;
       
+      let participationsHtml = "";
+      if (partner.participations && Array.isArray(partner.participations)) {
+        partner.participations.forEach((part: any, index: number) => {
+          participationsHtml += `
+            <div style="margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; background-color: #fafafa;">
+              <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #f97316; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">Centro de Trabajo #${index + 1}</h4>
+              <p style="margin: 4px 0; font-size: 13.5px;"><strong>Ubicación Exacta:</strong> ${part.locationExact}</p>
+              <p style="margin: 4px 0; font-size: 13.5px;"><strong>Perfil Solicitado:</strong> ${part.profile}</p>
+              <p style="margin: 4px 0; font-size: 13.5px;"><strong>Plazas disponibles:</strong> ${part.slotsCount} vacantes</p>
+              <p style="margin: 8px 0 4px 0; font-size: 13.5px;"><strong>Funciones:</strong></p>
+              <p style="margin: 0; font-size: 13px; color: #475569; white-space: pre-wrap; line-height: 1.4;">${part.functions}</p>
+              <p style="margin: 8px 0 4px 0; font-size: 13.5px;"><strong>Competencias:</strong></p>
+              <p style="margin: 0; font-size: 13px; color: #475569; white-space: pre-wrap; line-height: 1.4;">${part.competencies}</p>
+            </div>
+          `;
+        });
+      }
+
       const htmlBody = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
           <div style="background-color: #0f172a; padding: 28px; text-align: center; color: #ffffff;">
-            <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: -0.025em;">Registro de Nuevo Colaborador</h2>
+            <h2 style="margin: 0; font-size: 20px; font-weight: bold; letter-spacing: -0.025em; text-transform: uppercase;">Nueva Colaboración Registrada</h2>
+            <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8;">Ficha de empresa y centros asociados</p>
           </div>
-          <div style="padding: 28px; bg-color: #ffffff;">
+          <div style="padding: 28px; background-color: #ffffff;">
             <p style="margin-top: 0; font-size: 15px;">Hola,</p>
-            <p style="font-size: 15px;">Se ha recibido una nueva ficha de colaborador registrada a través del portal de la aplicación:</p>
+            <p style="font-size: 15px;">Se ha recibido una nueva ficha de colaboración registrada de forma segura en el portal:</p>
             
-            <table style="width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px;">
+            <h3 style="border-bottom: 2px solid #f97316; padding-bottom: 6px; font-size: 15px; color: #0f172a; text-transform: uppercase; margin-top: 24px;">1. Datos de la Empresa</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 12px 0 24px 0; font-size: 13.5px;">
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569; width: 35%;">Empresa:</td>
-                <td style="padding: 12px 8px; color: #0f172a; font-weight: 500;">${partner.companyName}</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569; width: 35%;">Empresa:</td>
+                <td style="padding: 10px 8px; color: #0f172a; font-weight: bold;">${partner.companyName}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569;">Ubicación:</td>
-                <td style="padding: 12px 8px; color: #0f172a;">${partner.location}</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569; vertical-align: top;">Descripción:</td>
+                <td style="padding: 10px 8px; color: #334155; line-height: 1.4;">${partner.companyDescription || ''}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569;">Capacidad:</td>
-                <td style="padding: 12px 8px; color: #0f172a; font-weight: 500;">${partner.capacity} vacantes</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Persona de Contacto:</td>
+                <td style="padding: 10px 8px; color: #0f172a;">${partner.contactPerson || ''}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569;">Perfil Solicitado:</td>
-                <td style="padding: 12px 8px; color: #0f172a; font-weight: 500;">${partner.profile === 'Otros' && partner.otherProfileText ? `${partner.profile} (${partner.otherProfileText})` : partner.profile}</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Cargo:</td>
+                <td style="padding: 10px 8px; color: #0f172a;">${partner.contactRole || ''}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569; vertical-align: top;">Funciones Principales:</td>
-                <td style="padding: 12px 8px; color: #334155; white-space: pre-wrap; font-size: 13.5px; line-height: 1.5;">${partner.functions}</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Email:</td>
+                <td style="padding: 10px 8px; color: #0284c7; font-weight: bold;"><a href="mailto:${partner.contactEmail || ''}" style="color: #0284c7; text-decoration: none;">${partner.contactEmail || ''}</a></td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569; vertical-align: top;">Competencias:</td>
-                <td style="padding: 12px 8px; color: #334155; white-space: pre-wrap; font-size: 13.5px; line-height: 1.5;">${partner.competencies}</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Teléfono:</td>
+                <td style="padding: 10px 8px; color: #0f172a;">${partner.contactPhone || ''}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 12px 8px; font-weight: bold; color: #475569;">Fecha de Registro:</td>
-                <td style="padding: 12px 8px; color: #64748b; font-size: 13px;">${partner.submissionDate}</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Fecha de Registro:</td>
+                <td style="padding: 10px 8px; color: #64748b; font-size: 13px;">${partner.submissionDate}</td>
               </tr>
             </table>
 
+            <h3 style="border-bottom: 2px solid #f97316; padding-bottom: 6px; font-size: 15px; color: #0f172a; text-transform: uppercase; margin-top: 24px;">2. Participación en el Programa</h3>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">Plazas, ubicaciones exactas y perfiles detallados:</p>
+            
+            ${participationsHtml}
+
             <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 24px; display: flex; align-items: center; gap: 12px;">
-              <div style="font-size: 24px;">📊</div>
+              <div style="font-size: 24px; margin-right: 12px;">📊</div>
               <div>
                 <strong style="display: block; font-size: 13px; color: #0f172a;">Ficha Excel Adjunta</strong>
-                <span style="font-size: 12px; color: #64748b;">Se ha generado el archivo estructurado para su importación inmediata.</span>
+                <span style="font-size: 12px; color: #64748b;">Se ha generado el archivo estructurado para su importación inmediata en Microsoft Excel.</span>
               </div>
             </div>
           </div>

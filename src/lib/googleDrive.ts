@@ -1,39 +1,53 @@
 import * as XLSX from 'xlsx';
 
-export interface PartnerSubmissionData {
-  companyName: string;
-  location: string;
-  capacity: number;
-  profile: string;
-  functions: string;
-  competencies: string;
-}
+import { PartnerData } from '../types';
 
-export function generateExcelBlob(data: PartnerSubmissionData): Blob {
+export function generateExcelBlob(data: PartnerData): Blob {
   const wb = XLSX.utils.book_new();
   
   // Format data elegantly inside cells
   const content = [
-    ['FORMULARIO DE RECOGIDA DE COLABORADORES'],
+    ['FORMULARIO DE RECOGIDA DE COLABORADORES - BEJOB LOGÍSTICA'],
     [],
-    ['Campo', 'Información Registrada'],
+    ['1. DATOS DE LA EMPRESA'],
     ['Nombre de la Empresa', data.companyName],
-    ['Ubicación', data.location],
-    ['Capacidad de Acogida', data.capacity],
-    ['Perfil del Trabajador', data.profile],
-    ['Funciones', data.functions],
-    ['Competencias Requeridas', data.competencies],
+    ['Descripción Genérica', data.companyDescription],
+    ['Persona de Contacto', data.contactPerson],
+    ['Cargo', data.contactRole],
+    ['Email de Contacto', data.contactEmail],
+    ['Teléfono de Contacto', data.contactPhone],
     [],
-    ['Fecha de Envío', new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES')],
-    ['Origen', 'Portal de colaboradores']
+    ['2. PARTICIPACIÓN EN EL PROGRAMA (CENTROS Y PERFILES)'],
+    ['Nº', 'Centro de Trabajo (Ubicación Exacta)', 'Perfil con posibilidad de incorporación', 'Funciones', 'Competencias', 'Plazas Prácticas']
   ];
+
+  // Append each work center participation
+  data.participations.forEach((part, index) => {
+    content.push([
+      String(index + 1),
+      part.locationExact,
+      part.profile,
+      part.functions,
+      part.competencies,
+      String(part.slotsCount)
+    ]);
+  });
+
+  content.push([]);
+  content.push(['3. INFORMACIÓN DE CONTROL']);
+  content.push(['Fecha de Envío', new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES')]);
+  content.push(['Origen', 'Portal de colaboradores BeJob']);
 
   const ws = XLSX.utils.aoa_to_sheet(content);
 
   // Set basic column widths for readability in Excel
   ws['!cols'] = [
-    { wch: 30 }, // Column A
-    { wch: 60 }  // Column B
+    { wch: 6 },   // Column A
+    { wch: 35 },  // Column B
+    { wch: 30 },  // Column C
+    { wch: 40 },  // Column D
+    { wch: 40 },  // Column E
+    { wch: 15 }   // Column F
   ];
 
   XLSX.utils.book_append_sheet(wb, ws, "Ficha Colaborador");

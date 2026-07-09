@@ -5,10 +5,9 @@ import { ActiveTab } from '../types';
 interface HeaderProps {
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
-  onOpenMailConfig: () => void;
 }
 
-export default function Header({ activeTab, setActiveTab, onOpenMailConfig }: HeaderProps) {
+export default function Header({ activeTab, setActiveTab }: HeaderProps) {
   return (
     <header className="bg-white border-b border-outline-variant fixed top-0 w-full z-50 shadow-sm">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
@@ -43,6 +42,16 @@ export default function Header({ activeTab, setActiveTab, onOpenMailConfig }: He
               }`}
             >
               Inicio
+            </button>
+            <button
+              onClick={() => setActiveTab('info')}
+              className={`px-3 py-1.5 rounded-full font-sans text-sm font-medium transition-all ${
+                activeTab === 'info' 
+                  ? 'bg-secondary-container text-primary font-semibold' 
+                  : 'text-on-surface-variant hover:bg-surface-container-low'
+              }`}
+            >
+              Propuesta de Valor
             </button>
             <button
               onClick={() => setActiveTab('submission')}
@@ -80,16 +89,6 @@ export default function Header({ activeTab, setActiveTab, onOpenMailConfig }: He
             >
               <span className="material-symbols-outlined text-base">help</span>
               <span className="hidden sm:inline">Soporte</span>
-            </button>
-
-            {/* Mail Config Button */}
-            <button
-              onClick={onOpenMailConfig}
-              title="Configurar Correo de Notificaciones"
-              className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs md:text-sm font-medium border border-outline text-on-surface-variant hover:bg-surface-container-low transition-all"
-            >
-              <span className="material-symbols-outlined text-base">settings</span>
-              <span className="hidden md:inline">Configurar Correo</span>
             </button>
 
 

@@ -64,12 +64,12 @@ export async function loadPartnerSubmissions(): Promise<PartnerData[]> {
       const item: PartnerData = {
         id: data.id,
         companyName: data.companyName,
-        location: data.location,
-        capacity: data.capacity,
-        profile: data.profile,
-        otherProfileText: data.otherProfileText,
-        functions: data.functions,
-        competencies: data.competencies,
+        companyDescription: data.companyDescription || '',
+        contactPerson: data.contactPerson || '',
+        contactRole: data.contactRole || '',
+        contactEmail: data.contactEmail || '',
+        contactPhone: data.contactPhone || '',
+        participations: data.participations || [],
         submissionDate: data.submissionDate
       };
       cloudItems.push(item);

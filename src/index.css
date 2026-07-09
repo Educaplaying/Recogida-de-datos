@@ -5,22 +5,35 @@
   --font-display: "Hanken Grotesk", sans-serif;
   
   /* Primary & Accent brand colors configured from the provided portal designs */
-  --color-primary: #003d9b;
-  --color-primary-container: #002c73;
+  --color-primary: #D21F1F;
+  --color-primary-container: #A81414;
   --color-on-primary: #ffffff;
-  --color-background: #f9f9ff;
-  --color-on-background: #041b3c;
+  
+  /* Soft warm paper-like background matching the infographic */
+  --color-background: #FAF9F6;
+  --color-on-background: #0f172a;
+  
+  /* Neutral surface elevations */
   --color-surface: #ffffff;
-  --color-on-surface: #041b3c;
-  --color-on-surface-variant: #434654;
-  --color-outline: #737685;
-  --color-outline-variant: #c3c6d6;
-  --color-surface-container-low: #f1f3ff;
-  --color-surface-container: #e8edff;
-  --color-surface-container-high: #e0e8ff;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
+  --color-outline: #94a3b8;
+  --color-outline-variant: #e2e8f0;
+  
+  /* Warm cream containers reflecting the infographic bento panels */
+  --color-surface-container-low: #F5F3ED;
+  --color-surface-container: #EBE7DF;
+  --color-surface-container-high: #DCD6CD;
   --color-surface-container-lowest: #ffffff;
-  --color-secondary-container: #d4e0f8;
-  --color-on-secondary-container: #576377;
+  
+  /* Light Red/Orange secondary container tints */
+  --color-secondary-container: #FFF5F5;
+  --color-on-secondary-container: #D21F1F;
+  
+  /* Vibrant brand orange accent from the infographic */
+  --color-accent: #E65F2B;
+  --color-accent-container: #FFF1EA;
+  --color-on-accent: #ffffff;
 }
 
 /* Custom visual styles */

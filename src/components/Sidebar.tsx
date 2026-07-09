@@ -30,6 +30,18 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         </button>
 
         <button
+          onClick={() => setActiveTab('info')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-sans text-sm font-medium ${
+            activeTab === 'info'
+              ? 'bg-secondary-container text-primary font-bold shadow-sm'
+              : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
+          }`}
+        >
+          <span className="material-symbols-outlined">info</span>
+          <span>Propuesta de Valor</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('submission')}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-sans text-sm font-medium ${
             activeTab === 'submission' || activeTab === 'success'

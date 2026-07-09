@@ -9,8 +9,8 @@ import LandingView from './components/LandingView';
 import SubmissionForm from './components/SubmissionForm';
 import SuccessView from './components/SuccessView';
 import SupportView from './components/SupportView';
+import InfoView from './components/InfoView';
 import ToastContainer from './components/ToastContainer';
-import MailConfigModal from './components/MailConfigModal';
 import { initAuth, googleSignIn, logout } from './lib/googleAuth';
 import { savePartnerSubmission, loadPartnerSubmissions, saveSupportTicket } from './lib/db';
 import { generateExcelBlob } from './lib/googleDrive';
@@ -21,7 +21,6 @@ export default function App() {
   const [tickets, setTickets] = useState<SupportTicket[]>(SAMPLE_TICKETS);
   const [lastSubmittedPartner, setLastSubmittedPartner] = useState<PartnerData | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [isMailConfigOpen, setIsMailConfigOpen] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -119,14 +118,7 @@ export default function App() {
       setLastSubmittedPartner(completePartner);
 
       // 4. Generate the Excel file and convert it to Base64 to send to our native backend API
-      const excelBlob = generateExcelBlob({
-        companyName: completePartner.companyName,
-        location: completePartner.location,
-        capacity: completePartner.capacity,
-        profile: completePartner.profile,
-        functions: completePartner.functions,
-        competencies: completePartner.competencies
-      });
+      const excelBlob = generateExcelBlob(completePartner);
 
       const reader = new FileReader();
       const sendEmailPromise = new Promise((resolve, reject) => {
@@ -149,7 +141,15 @@ export default function App() {
               })
             });
 
-            const resData = await response.json();
+            let resData: any = {};
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              resData = await response.json();
+            } else {
+              const text = await response.text();
+              throw new Error(text || `Error del servidor (${response.status})`);
+            }
+
             if (!response.ok) {
               throw new Error(resData.error || 'Error al enviar por correo');
             }
@@ -201,7 +201,15 @@ export default function App() {
         })
       });
 
-      const resData = await response.json();
+      let resData: any = {};
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        resData = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text || `Error del servidor (${response.status})`);
+      }
+
       if (!response.ok) {
         throw new Error(resData.error || 'Error al enviar el mensaje de soporte');
       }
@@ -225,7 +233,6 @@ export default function App() {
       <Header 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
-        onOpenMailConfig={() => setIsMailConfigOpen(true)}
       />
 
       {/* Main Body Layout Grid */}
@@ -241,6 +248,10 @@ export default function App() {
             {/* Conditional Tab Rendering */}
             {activeTab === 'landing' && (
               <LandingView setActiveTab={setActiveTab} />
+            )}
+
+            {activeTab === 'info' && (
+              <InfoView setActiveTab={setActiveTab} />
             )}
 
             {activeTab === 'submission' && (
@@ -274,12 +285,6 @@ export default function App() {
       <ToastContainer 
         toasts={toasts} 
         onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} 
-      />
-
-      <MailConfigModal 
-        isOpen={isMailConfigOpen} 
-        onClose={() => setIsMailConfigOpen(false)} 
-        showToast={showToast} 
       />
 
     </div>

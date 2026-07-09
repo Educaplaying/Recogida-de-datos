@@ -2,15 +2,24 @@
  * Shared Type Definitions for the Corporate Partner Portal
  */
 
+export interface WorkCenterParticipation {
+  id: string;
+  locationExact: string;
+  profile: string;
+  functions: string;
+  competencies: string;
+  slotsCount: number;
+}
+
 export interface PartnerData {
   id: string;
   companyName: string;
-  location: string;
-  capacity: number;
-  profile: string;
-  otherProfileText?: string;
-  functions: string;
-  competencies: string;
+  companyDescription: string;
+  contactPerson: string;
+  contactRole: string;
+  contactEmail: string;
+  contactPhone: string;
+  participations: WorkCenterParticipation[];
   submissionDate: string;
 }
 
@@ -24,7 +33,7 @@ export interface SupportTicket {
   status: 'Pending' | 'In Progress' | 'Resolved';
 }
 
-export type ActiveTab = 'landing' | 'submission' | 'success' | 'support';
+export type ActiveTab = 'landing' | 'submission' | 'success' | 'support' | 'info';
 
 export interface Toast {
   id: string;

@@ -13,14 +13,7 @@ export default function SuccessView({ submittedData, onReset, setActiveTab }: Su
   const handleDownloadExcel = () => {
     if (!submittedData) return;
     
-    const excelBlob = generateExcelBlob({
-      companyName: submittedData.companyName,
-      location: submittedData.location,
-      capacity: submittedData.capacity,
-      profile: submittedData.profile,
-      functions: submittedData.functions,
-      competencies: submittedData.competencies
-    });
+    const excelBlob = generateExcelBlob(submittedData);
 
     const url = URL.createObjectURL(excelBlob);
     const link = document.createElement('a');
@@ -34,31 +27,40 @@ export default function SuccessView({ submittedData, onReset, setActiveTab }: Su
   const handleDownloadPDF = () => {
     if (!submittedData) return;
     
-    // Create a beautiful textual formatted document
+    let participationsText = "";
+    submittedData.participations.forEach((part, index) => {
+      participationsText += `
+CENTRO DE TRABAJO #${index + 1}:
+------------------------------------------------------------
+- Ubicación Exacta:      ${part.locationExact}
+- Perfil Solicitado:     ${part.profile}
+- Plazas de Prácticas:   ${part.slotsCount}
+- Funciones:             ${part.functions}
+- Competencias:          ${part.competencies}
+`;
+    });
+
     const docText = `
 ============================================================
-       PORTAL DE COLABORACIÓN CORPORATIVA - RESUMEN
+       PORTAL DE COLABORACIÓN CORPORATIVA - RESUMEN DE FICHA
 ============================================================
 Fecha de Registro: ${submittedData.submissionDate}
 ID de Registro:    ${submittedData.id}
 
-DETALLES DE LA EMPRESA:
+APARTADO 1: DATOS DE LA EMPRESA
 ------------------------------------------------------------
 Nombre de la Empresa:  ${submittedData.companyName}
-Ubicación / Sede:      ${submittedData.location}
-Capacidad de Acogida:  ${submittedData.capacity} participantes
-Perfil Solicitado:     ${submittedData.profile}
+Descripción Genérica:  ${submittedData.companyDescription}
+Persona de Contacto:   ${submittedData.contactPerson}
+Cargo:                 ${submittedData.contactRole}
+Email de Contacto:     ${submittedData.contactEmail}
+Teléfono de Contacto:  ${submittedData.contactPhone}
 
-FUNCIONES Y COMPETENCIAS:
+APARTADO 2: PARTICIPACIÓN EN EL PROGRAMA
 ------------------------------------------------------------
-Funciones:
-${submittedData.functions}
-
-Competencias Requeridas:
-${submittedData.competencies}
-
+${participationsText}
 ------------------------------------------------------------
-Estado del Registro:   PROCESADO - PENDIENTE DE ASIGNACIÓN DE TUTOR
+Estado del Registro:   PROCESADO - ENVIADO A srubin@bejob.com
 Asesor Técnico:       Fundación Secretariado Gitano & BeJob
 Plazo de Contacto:     Dentro de las próximas 48 horas laborales
 ============================================================
@@ -109,16 +111,18 @@ Plazo de Contacto:     Dentro de las próximas 48 horas laborales
                   <span className="font-semibold">{submittedData.companyName}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-on-surface-variant block">Ubicación</span>
-                  <span className="font-semibold">{submittedData.location}</span>
+                  <span className="text-xs text-on-surface-variant block">Contacto</span>
+                  <span className="font-semibold">{submittedData.contactPerson}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-on-surface-variant block">Capacidad</span>
-                  <span className="font-semibold">{submittedData.capacity} plazas</span>
+                  <span className="text-xs text-on-surface-variant block">Centros Registrados</span>
+                  <span className="font-semibold">{submittedData.participations.length} centro(s) de trabajo</span>
                 </div>
                 <div>
-                  <span className="text-xs text-on-surface-variant block">Perfil</span>
-                  <span className="font-semibold truncate block">{submittedData.profile}</span>
+                  <span className="text-xs text-on-surface-variant block">Plazas Totales</span>
+                  <span className="font-semibold">
+                    {submittedData.participations.reduce((acc, curr) => acc + curr.slotsCount, 0)} plazas de prácticas
+                  </span>
                 </div>
               </div>
             </div>
