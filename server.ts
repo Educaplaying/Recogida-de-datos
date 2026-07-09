@@ -104,7 +104,7 @@ async function startServer() {
                 <td style="padding: 10px 8px; color: #0f172a;">${partner.contactPerson || ''}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Cargo:</td>
+                <td style="padding: 10px 8px; font-weight: bold; color: #475569;">Cargo / Puesto:</td>
                 <td style="padding: 10px 8px; color: #0f172a;">${partner.contactRole || ''}</td>
               </tr>
               <tr style="border-bottom: 1px solid #f1f5f9;">

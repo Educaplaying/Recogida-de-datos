@@ -163,7 +163,7 @@ export default function App() {
             "Nombre de la empresa": completePartner.companyName,
             "Descripción de la empresa": completePartner.companyDescription,
             "Persona de contacto principal": completePartner.contactPerson,
-            "Cargo": completePartner.contactRole,
+            "Cargo / Puesto": completePartner.contactRole,
             "Email de contacto": completePartner.contactEmail,
             "Teléfono de contacto": completePartner.contactPhone,
             "Participaciones en el programa": completePartner.participations.map((p, idx) => 
