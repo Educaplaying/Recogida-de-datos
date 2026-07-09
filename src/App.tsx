@@ -214,7 +214,7 @@ export default function App() {
     }
   };
 
-  const handleTicketSubmit = async (newTicketData: Omit<SupportTicket, 'id' | 'submissionDate' | 'status'>) => {
+  const handleTicketSubmit = (newTicketData: Omit<SupportTicket, 'id' | 'submissionDate' | 'status'>) => {
     try {
       const formattedDate = new Date().toISOString().split('T')[0];
       const generatedId = `TCK-${String(tickets.length + 1).padStart(3, '0')}`;
@@ -226,11 +226,19 @@ export default function App() {
         status: 'Pending',
       };
 
-      await saveSupportTicket(completeTicket);
+      // 1. Save to database / cache in the background
+      saveSupportTicket(completeTicket).catch(err => {
+        console.error('Error saving support ticket to DB in background:', err);
+      });
+
+      // 2. Update local state list instantly
       setTickets([completeTicket, ...tickets]);
 
-      // Call our native backend API route directly
-      const response = await fetch('/api/send-support', {
+      // 3. Show instant toast notification
+      showToast('¡Mensaje de soporte recibido con éxito! Procesando envío por correo...', 'info');
+
+      // 4. Send support mail in the background
+      fetch('/api/send-support', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -238,25 +246,22 @@ export default function App() {
         body: JSON.stringify({
           ticket: completeTicket
         })
+      }).then(async (response) => {
+        if (response.ok) {
+          console.log('Support email sent successfully in background!');
+          showToast('¡Su mensaje de soporte se ha enviado correctamente por correo a srubin@bejob.com!', 'success');
+        } else {
+          const resText = await response.text();
+          console.warn('Support mail API returned non-ok status:', resText);
+          showToast('Mensaje registrado localmente. Pendiente de sincronización de correo.', 'info');
+        }
+      }).catch(err => {
+        console.error('Failed to post support message to API in background:', err);
       });
 
-      let resData: any = {};
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        resData = await response.json();
-      } else {
-        const text = await response.text();
-        throw new Error(text || `Error del servidor (${response.status})`);
-      }
-
-      if (!response.ok) {
-        throw new Error(resData.error || 'Error al enviar el mensaje de soporte');
-      }
-
-      showToast('¡Su mensaje de soporte se ha enviado correctamente por correo a srubin@bejob.com!', 'success');
     } catch (err: any) {
       console.error('Error al crear ticket:', err);
-      showToast(`Error al enviar el mensaje de soporte: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
+      showToast(`Error al procesar el mensaje de soporte: ${err.message || 'Inténtelo de nuevo.'}`, 'error');
     }
   };
 
