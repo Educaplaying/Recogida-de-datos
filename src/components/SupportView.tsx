@@ -48,6 +48,16 @@ export default function SupportView({ onSubmitTicket, setActiveTab }: SupportVie
         
         {/* Left column: Information & Contact Info Cards */}
         <div className="lg:col-span-5 space-y-6">
+          <div className="pb-4 border-b border-outline-variant/20 mb-2">
+            <button 
+              onClick={() => setActiveTab('landing')}
+              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-bold text-sm transition-colors focus:outline-none group"
+            >
+              <span className="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
+              <span>Volver al Inicio</span>
+            </button>
+          </div>
+
           <div className="inline-flex items-center gap-2 bg-secondary-container text-primary px-3 py-1 rounded-full text-xs font-semibold tracking-wide">
             <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
             Canal de Ayuda

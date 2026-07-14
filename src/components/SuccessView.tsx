@@ -60,8 +60,8 @@ APARTADO 2: PARTICIPACIÓN EN EL PROGRAMA
 ------------------------------------------------------------
 ${participationsText}
 ------------------------------------------------------------
-Estado del Registro:   PROCESADO - ENVIADO AL EQUIPO DE BEJOB
-Asesor Técnico:       Fundación Secretariado Gitano & BeJob
+Estado del Registro:   PROCESADO - ENVIADO AL EQUIPO DE BEJOB EMPLEABILIDAD
+Asesor Técnico:       Fundación Secretariado Gitano & BeJob Empleabilidad
 Plazo de Contacto:     Dentro de las próximas 48 horas laborales
 ============================================================
     `;

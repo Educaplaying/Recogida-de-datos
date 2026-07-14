@@ -111,7 +111,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: '¿Quién se encarga del seguimiento de los candidatos?',
-    answer: 'Un tutor especializado de la Fundación Secretariado Gitano y BeJob coordinará con el responsable de su empresa el proceso de selección, la formación y el seguimiento diario del participante.',
+    answer: 'Un tutor especializado de la Fundación Secretariado Gitano y BeJob Empleabilidad coordinará con el responsable de su empresa el proceso de selección, la formación y el seguimiento diario del participante.',
     category: 'Gestión'
   },
   {

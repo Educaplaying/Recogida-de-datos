@@ -34,7 +34,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
             className="hover:opacity-95 transition-opacity flex items-center"
           >
             <img 
-              alt="BeJob" 
+              alt="BeJob Empleabilidad" 
               className="h-9 md:h-11 w-auto object-contain" 
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA_1kWz79sAn1E-IIg8YaZ_kk3UTMr8uMzrah0_duTl7PiCv2qZHI-UAaXneo8PN55SXIvauHUot8S5gvII_AkVb3Ch3fiHfN59yNgVsR1_g4lrY4ys4MznenSz8FXJ93hDn81Eu4DYBn7sHGxqGOSs0kB79IcySXwIWPGd0t1_Vrbt4V3AFb3nWot38f_pqCYb9mIKuonve6d-EgGgV6ja2EffXlUOPWwDkDeTqHJkYvM5HFpsR5fnSwhu4vMVzD9UiM"
             />

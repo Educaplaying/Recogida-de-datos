@@ -14,7 +14,7 @@ export default function Footer({ setActiveTab }: FooterProps) {
           <span className="font-bold text-primary text-sm font-display">Alianza Corporativa</span>
           <span className="hidden sm:inline text-outline-variant text-sm">|</span>
           <span className="text-caption text-xs md:text-sm text-on-surface-variant font-sans">
-            © 2026 Fundación Secretariado Gitano & BeJob. Todos los derechos reservados.
+            © 2026 Fundación Secretariado Gitano & BeJob Empleabilidad. Todos los derechos reservados.
           </span>
         </div>
 

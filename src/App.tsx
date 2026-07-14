@@ -146,7 +146,7 @@ export default function App() {
           }).then(async (response) => {
             if (response.ok) {
               console.log('Email sent successfully in background!');
-              showToast(`¡Ficha de colaborador enviada correctamente al equipo de BeJob!`, 'success');
+              showToast(`¡Ficha de colaborador enviada correctamente al equipo de BeJob Empleabilidad!`, 'success');
             } else {
               const resText = await response.text();
               console.warn('Backend email API returned warning/error:', resText);
@@ -247,7 +247,7 @@ export default function App() {
       }).then(async (response) => {
         if (response.ok) {
           console.log('Support email sent successfully in background!');
-          showToast('¡Su mensaje de soporte se ha enviado correctamente por correo al equipo de BeJob!', 'success');
+          showToast('¡Su mensaje de soporte se ha enviado correctamente por correo al equipo de BeJob Empleabilidad!', 'success');
         } else {
           const resText = await response.text();
           console.warn('Support mail API returned non-ok status:', resText);

@@ -98,7 +98,7 @@ export default function LandingView({ setActiveTab }: LandingViewProps) {
         <div className="lg:col-span-7 space-y-6">
           <div className="inline-flex items-center gap-2 bg-secondary-container text-primary px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">
             <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-            Fundación Secretariado Gitano + BeJob Formación y Empleo
+            Fundación Secretariado Gitano + BeJob Empleabilidad
           </div>
 
           <h1 className="text-4xl md:text-5xl font-extrabold font-display text-on-surface tracking-tight leading-[1.12]">
@@ -189,7 +189,7 @@ export default function LandingView({ setActiveTab }: LandingViewProps) {
             Tu Aliado para un Empleo más Inclusivo y Efectivo
           </h2>
           <p className="text-sm md:text-base text-on-surface-variant leading-relaxed">
-            En <strong>BeJob</strong> y la <strong>Fundación Secretariado Gitano</strong> conectamos a tu empresa con talento altamente motivado y formado de forma práctica en logística.
+            En <strong>BeJob Empleabilidad</strong> y la <strong>Fundación Secretariado Gitano</strong> conectamos a tu empresa con talento altamente motivado y formado de forma práctica en logística.
           </p>
         </div>
 
@@ -370,8 +370,8 @@ export default function LandingView({ setActiveTab }: LandingViewProps) {
         <div className="md:col-span-5 relative">
           <div className="rounded-2xl overflow-hidden border border-outline-variant/60 h-44 w-full relative shadow-inner">
             <img 
-              src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80" 
-              alt="Colaboradores en almacén logístico"
+              src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=600&q=80" 
+              alt="Centro logístico de almacenes"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-primary/20 backdrop-filter backdrop-saturate-150"></div>
@@ -384,7 +384,7 @@ export default function LandingView({ setActiveTab }: LandingViewProps) {
         </div>
       </div>
 
-      {/* Bottom Final Banner Action (Section 7) */}
+      {/* Bottom Final Banner Action */}
       <div className="bg-gradient-to-r from-primary to-accent text-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 shadow-md">
         <div className="space-y-1.5 text-center md:text-left">
           <h3 className="text-lg md:text-xl font-bold font-display uppercase tracking-wide">
@@ -402,6 +402,7 @@ export default function LandingView({ setActiveTab }: LandingViewProps) {
           <span className="material-symbols-outlined text-base">arrow_forward</span>
         </button>
       </div>
+
     </div>
   );
 }
